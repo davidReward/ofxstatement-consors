@@ -2,6 +2,7 @@ from ofxstatement.plugin import Plugin
 from ofxstatement.parser import CsvStatementParser
 from ofxstatement.statement import StatementLine
 import csv
+import sys
 
 
 class ConsorsParser(CsvStatementParser):
@@ -15,7 +16,7 @@ class ConsorsParser(CsvStatementParser):
     # 6 Verwendungszweck 
     # 7 Betrag in EUR
 
-    mappings = {"date": 1, "amount": 7}
+    mappings = {"date": 1, "payee": 2, "amount": 7}
     date_format = "%d.%m.%Y"
 
     def split_records(self):
@@ -39,6 +40,16 @@ class ConsorsParser(CsvStatementParser):
         sl = super(ConsorsParser, self).parse_record(line)
 
         sl.memo = line[5] + "; " + line[6] + "; " + line[2]
+
+        # generate id for statement
+        id_date = sl.date.strftime('%Y%m%d')
+
+        # create a hash from payee, memo, amount
+        id_hash = str(hash(sl.payee + sl.memo + str(sl.amount)) % ((sys.maxsize + 1) * 2))
+
+        # final id is constructed from date and hash (so hopefully this is unique)
+        sl.id = id_date + id_hash
+
         return sl
  
 
