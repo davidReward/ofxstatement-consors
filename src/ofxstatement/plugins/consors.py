@@ -17,7 +17,8 @@ class ConsorsParser(CsvStatementParser):
     # 7 Betrag in EUR
 
     mappings = {"date": 1, "amount": 7}
-    date_format = "%Y-%m-%d"
+    #date_format = "%Y-%m-%d"
+    date_format = "%d.%m.%Y"
 
     def split_records(self):
         return csv.reader(self.fin, delimiter=';')
